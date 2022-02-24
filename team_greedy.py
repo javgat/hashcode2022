@@ -79,7 +79,7 @@ def main():
     pending_projects: List[Project] = []
     score = 0
     while projects:
-        #print(day)
+        print(day)
         projects.sort(key=lambda x: max(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration))
         #print([max(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration) for x in projects])
         #print(projects)
@@ -88,7 +88,7 @@ def main():
         prev_num_projects = len(projects)
         starting_projects_names = []
         ## VACIAMOS
-        print("a vaciar!")
+        #print("a vaciar!")
         removing_pends: List[str] = []
         for pend in pending_projects:
             if day >= pend.start_day + pend.duration:
@@ -101,7 +101,7 @@ def main():
         pending_projects = [p for p in pending_projects if p.name not in removing_pends]
         #borrar projs de pends
         for project in projects:
-            print("vaciado")
+            #print("vaciado")
             project_cant = False
             assigned_workers = []
             for role in project.roles:
@@ -112,7 +112,6 @@ def main():
                 assigned_workers.append(name)
                 if project_cant:
                     break
-            print("roles mirado")
             if not project_cant:
                 for name in assigned_workers:
                     free_workers.remove(name)
@@ -121,7 +120,11 @@ def main():
         pending_projects_new = [set_start_day(p, day) for p in projects if p.name in starting_projects_names]
         pending_projects += pending_projects_new
         projects = [p for p in projects if p.name not in starting_projects_names]
-        day += 1
+        if pending_projects:
+            min_days_proj = min([(p.start_day+p.duration)-day for p in pending_projects])
+            day += min_days_proj
+        else:
+            day += 1
     print(score)
     print(len(planned))
     for plann in planned:
