@@ -14,7 +14,7 @@ class Project():
     duration: int
     score: int
     bbefore: int
-    roles: Dict[str, List[int]]
+    roles: List[Tuple[str, int]]
     start_day: int = -1
 
 @dataclass
@@ -48,15 +48,12 @@ def input_data() -> Tuple[List[Worker], List[Project]]:
         score = int(proj_line[2])
         bbefore = int(proj_line[3])
         n_roles = int(proj_line[4])
-        roles: Dict[str, List[int]] = {}
+        roles: List[Tuple[str, int]] = []
         for _ in range(n_roles):
             role_line = input().split()
             r_name = role_line[0]
             r_level = int(role_line[1])
-            if r_name in roles:
-                roles[r_name].append(r_level)
-            else:
-                roles[r_name] = [r_level]
+            roles.append((r_name, r_level))
         p = Project(name, duration, score, bbefore, roles)
         projects.append(p)
     return (workers, projects)
@@ -82,12 +79,16 @@ def main():
     pending_projects: List[Project] = []
     score = 0
     while projects:
-        projects.sort(key=lambda x: min(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration))
+        #print(day)
+        projects.sort(key=lambda x: max(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration))
+        #print([max(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration) for x in projects])
+        #print(projects)
         if prev_num_projects == len(projects) and len(free_workers) == len(workers):
             break
         prev_num_projects = len(projects)
         starting_projects_names = []
         ## VACIAMOS
+        print("a vaciar!")
         removing_pends: List[str] = []
         for pend in pending_projects:
             if day >= pend.start_day + pend.duration:
@@ -95,21 +96,23 @@ def main():
                 plann = [p for p in planned if p.name == pend.name][0]
                 for wk in plann.workers:
                     free_workers.append(wk)
-                score += pend.score + min(0, (pend.bbefore-(day+pend.duration)))
+                extra_score = max(0, pend.score + min(0, (pend.bbefore-day)))
+                score += extra_score
         pending_projects = [p for p in pending_projects if p.name not in removing_pends]
         #borrar projs de pends
         for project in projects:
+            print("vaciado")
             project_cant = False
             assigned_workers = []
             for role in project.roles:
-                for level in project.roles[role]:
-                    name, exists = lookup_free_worker(free_workers, workers, role, level, assigned_workers)
-                    if not exists:
-                        project_cant = True
-                        break
-                    assigned_workers.append(name)
+                name, exists = lookup_free_worker(free_workers, workers, role[0], role[1], assigned_workers)
+                if not exists:
+                    project_cant = True
+                    break
+                assigned_workers.append(name)
                 if project_cant:
                     break
+            print("roles mirado")
             if not project_cant:
                 for name in assigned_workers:
                     free_workers.remove(name)
