@@ -15,6 +15,7 @@ class Project():
     score: int
     bbefore: int
     roles: Dict[str, List[int]]
+    start_day: int = -1
 
 @dataclass
 class PlannedProject():
@@ -60,39 +61,69 @@ def input_data() -> Tuple[List[Worker], List[Project]]:
         projects.append(p)
     return (workers, projects)
 
+def set_start_day(p: Project, day: int) -> Project:
+    p.start_day = day
+    return p
+
+def lookup_free_worker(free_workers: List[str], workers: List[Worker], role: str, level: int, assigned: List[str]) -> Tuple[str, bool]:
+    for worker in workers:
+        if worker.name in free_workers and worker.name not in assigned:
+            if role in worker.skills:
+                if worker.skills[role] >= level:
+                    return worker.name, True
+    return None, False
+
 def main():
     workers, projects = input_data()
     free_workers = [w.name for w in workers]
     day = 0
-    projects.sort(key=lambda x: min(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration))
     prev_num_projects = 0
+    planned: List[PlannedProject] = []
+    pending_projects: List[Project] = []
+    score = 0
     while projects:
+        projects.sort(key=lambda x: min(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration))
         if prev_num_projects == len(projects) and len(free_workers) == len(workers):
             break
         prev_num_projects = len(projects)
         starting_projects_names = []
+        ## VACIAMOS
+        removing_pends: List[str] = []
+        for pend in pending_projects:
+            if day >= pend.start_day + pend.duration:
+                removing_pends.append(pend.name)
+                plann = [p for p in planned if p.name == pend.name][0]
+                for wk in plann.workers:
+                    free_workers.append(wk)
+                score += pend.score + min(0, (pend.bbefore-(day+pend.duration)))
+        pending_projects = [p for p in pending_projects if p.name not in removing_pends]
+        #borrar projs de pends
         for project in projects:
             project_cant = False
             assigned_workers = []
             for role in project.roles:
                 for level in project.roles[role]:
-                    name, exists = lookup_free_worker(free_workers, workers, role, level)
-                    assigned_workers.append(name)
+                    name, exists = lookup_free_worker(free_workers, workers, role, level, assigned_workers)
                     if not exists:
                         project_cant = True
                         break
+                    assigned_workers.append(name)
                 if project_cant:
                     break
-            for name in assigned_workers:
-                free_workers.remove(name)
-            starting_projects_names.append(project.name)
+            if not project_cant:
+                for name in assigned_workers:
+                    free_workers.remove(name)
+                starting_projects_names.append(project.name)
+                planned.append(PlannedProject(project.name, assigned_workers))
+        pending_projects_new = [set_start_day(p, day) for p in projects if p.name in starting_projects_names]
+        pending_projects += pending_projects_new
         projects = [p for p in projects if p.name not in starting_projects_names]
-            
-            
-
-
-    #print(workers)
-    #print(projects)
+        day += 1
+    print(score)
+    print(len(planned))
+    for plann in planned:
+        print(plann.name)
+        print(*plann.workers, sep=" ")
 
 
 if __name__ == "__main__":
