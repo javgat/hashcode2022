@@ -16,6 +16,11 @@ class Project():
     bbefore: int
     roles: Dict[str, List[int]]
 
+@dataclass
+class PlannedProject():
+    name: str
+    workers: List[str]
+
 def input_data() -> Tuple[List[Worker], List[Project]]:
     first_line = input().split()
     n_workers = int(first_line[0])
@@ -57,8 +62,38 @@ def input_data() -> Tuple[List[Worker], List[Project]]:
 
 def main():
     workers, projects = input_data()
-    print(workers)
-    print(projects)
+    free_workers = [w.name for w in workers]
+    day = 0
+    projects.sort(key=lambda x: min(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration))
+    prev_num_projects = 0
+    while projects:
+        if prev_num_projects == len(projects) and len(free_workers) == len(workers):
+            break
+        prev_num_projects = len(projects)
+        starting_projects_names = []
+        for project in projects:
+            project_cant = False
+            assigned_workers = []
+            for role in project.roles:
+                for level in project.roles[role]:
+                    name, exists = lookup_free_worker(free_workers, workers, role, level)
+                    assigned_workers.append(name)
+                    if not exists:
+                        project_cant = True
+                        break
+                if project_cant:
+                    break
+            for name in assigned_workers:
+                free_workers.remove(name)
+            starting_projects_names.append(project.name)
+        projects = [p for p in projects if p.name not in starting_projects_names]
+            
+            
+
+
+    #print(workers)
+    #print(projects)
+
 
 if __name__ == "__main__":
     main()
