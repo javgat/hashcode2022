@@ -86,6 +86,8 @@ def main():
     score = 0
     while projects:
         #print(day)
+        if day >= 15000:
+            break
         projects.sort(key=lambda x: (max(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration), -x.duration), reverse=True)
         #print([(max(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration), -x.duration) for x in projects])
         #print(projects)
@@ -105,7 +107,12 @@ def main():
                 extra_score = max(0, pend.score + min(0, (pend.bbefore-day)))
                 score += extra_score
         #borrar projs de pends
+        zero_projects = []
         for project in projects:
+            p_score = max(0, project.score + min(0, (project.bbefore-day)))
+            if p_score == 0:
+                zero_projects.append(project)
+                continue
             #print("vaciado")
             project_cant = False
             assigned_workers = []
@@ -130,6 +137,8 @@ def main():
                 starting_projects_names.append(project.name)
                 assig_workers = [t[0] for t in assigned_tuples]
                 planned.append(PlannedProject(project.name, assig_workers))
+        for p in zero_projects:
+            projects.remove(p)
         pending_projects_new = [set_start_day(p, day) for p in projects if p.name in starting_projects_names]
         pending_projects += pending_projects_new
         projects = [p for p in projects if p.name not in starting_projects_names]
