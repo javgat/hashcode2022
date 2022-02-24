@@ -22,10 +22,11 @@ class PlannedProject():
     name: str
     workers: List[str]
 
-def input_data() -> Tuple[List[Worker], List[Project]]:
+def input_data() -> Tuple[List[Worker], List[Project], Dict[str, List[Worker]]]:
     first_line = input().split()
     n_workers = int(first_line[0])
     n_projects = int(first_line[1])
+    skill_workers: Dict[str, List[Worker]] = {}
     workers: List[Worker] = []
     for _ in range(n_workers):
         worker_line = input().split()
@@ -38,6 +39,11 @@ def input_data() -> Tuple[List[Worker], List[Project]]:
             s_level = int(skill_line[1])
             skills[s_name] = s_level
         w = Worker(name, skills)
+        for skill in w.skills:
+            if skill in skill_workers:
+                skill_workers[skill].append(w)
+            else:
+                skill_workers[skill] = [w]
         workers.append(w)
     
     projects: List[Project] = []
@@ -54,24 +60,24 @@ def input_data() -> Tuple[List[Worker], List[Project]]:
             r_name = role_line[0]
             r_level = int(role_line[1])
             roles.append((r_name, r_level))
-        p = Project(name, duration, score, bbefore, roles)
-        projects.append(p)
-    return (workers, projects)
+        if score > 0 and n_roles <= n_workers:
+            p = Project(name, duration, score, bbefore, roles)
+            projects.append(p)
+    return (workers, projects, skill_workers)
 
 def set_start_day(p: Project, day: int) -> Project:
     p.start_day = day
     return p
 
-def lookup_free_worker(free_workers: List[str], workers: List[Worker], role: str, level: int, assigned: List[str]) -> Tuple[str, bool]:
-    for worker in workers:
+def lookup_free_worker(free_workers: List[str], skill_workers: Dict[str, List[Worker]], role: str, level: int, assigned: List[str]) -> Tuple[str, bool]:
+    for worker in skill_workers[role]:
         if worker.name in free_workers and worker.name not in assigned:
-            if role in worker.skills:
-                if worker.skills[role] >= level:
-                    return worker.name, True
+            if worker.skills[role] >= level:
+                return worker.name, True
     return None, False
 
 def main():
-    workers, projects = input_data()
+    workers, projects, skill_workers = input_data()
     free_workers = [w.name for w in workers]
     day = 0
     prev_num_projects = 0
@@ -79,7 +85,7 @@ def main():
     pending_projects: List[Project] = []
     score = 0
     while projects:
-        print(day)
+        #print(day)
         projects.sort(key=lambda x: max(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration))
         #print([max(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration) for x in projects])
         #print(projects)
@@ -107,7 +113,7 @@ def main():
             if len(project.roles) > len(free_workers):
                 continue
             for role in project.roles:
-                name, exists = lookup_free_worker(free_workers, workers, role[0], role[1], assigned_workers)
+                name, exists = lookup_free_worker(free_workers, skill_workers, role[0], role[1], assigned_workers)
                 if not exists:
                     project_cant = True
                     break
