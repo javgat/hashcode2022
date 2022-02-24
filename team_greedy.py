@@ -104,6 +104,8 @@ def main():
             #print("vaciado")
             project_cant = False
             assigned_workers = []
+            if len(project.roles) > len(free_workers):
+                continue
             for role in project.roles:
                 name, exists = lookup_free_worker(free_workers, workers, role[0], role[1], assigned_workers)
                 if not exists:
