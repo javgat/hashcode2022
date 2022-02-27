@@ -7,6 +7,7 @@ from typing import Dict, List, Tuple
 class Worker():
     name: str
     skills: Dict[str, int]
+    free: bool = True
 
 @dataclass
 class Project():
@@ -22,12 +23,27 @@ class PlannedProject():
     name: str
     workers: List[str]
 
-def input_data() -> Tuple[List[Worker], List[Project], Dict[str, List[Worker]]]:
+def input_data() -> Tuple[Dict[str, Worker], Dict[str, Project], Dict[str, List[Worker]]]:
+    """
+    Reads the input data.
+
+    Returns
+    -------
+    dict of str and worker
+        All workers stored
+        key: worker name --- value: Worker
+    dict of str and project
+        All projects stored
+        key: project name --- value: Project
+    dict of str and list of workers
+        Workers skills
+        key: skill --- value: List of workers with that skill
+    """
     first_line = input().split()
     n_workers = int(first_line[0])
     n_projects = int(first_line[1])
     skill_workers: Dict[str, List[Worker]] = {}
-    workers: List[Worker] = []
+    workers: Dict[str, Worker] = {}
     for _ in range(n_workers):
         worker_line = input().split()
         name = worker_line[0]
@@ -44,9 +60,9 @@ def input_data() -> Tuple[List[Worker], List[Project], Dict[str, List[Worker]]]:
                 skill_workers[skill].append(w)
             else:
                 skill_workers[skill] = [w]
-        workers.append(w)
+        workers[name] = w
     
-    projects: List[Project] = []
+    projects: Dict[str, Project] = {}
     for _ in range(n_projects):
         proj_line = input().split()
         name = proj_line[0]
@@ -62,23 +78,27 @@ def input_data() -> Tuple[List[Worker], List[Project], Dict[str, List[Worker]]]:
             roles.append((r_name, r_level))
         if score > 0 and n_roles <= n_workers:
             p = Project(name, duration, score, bbefore, roles)
-            projects.append(p)
+            projects[name] = p
     return (workers, projects, skill_workers)
 
 def set_start_day(p: Project, day: int) -> Project:
     p.start_day = day
     return p
 
-def lookup_free_worker(free_workers: List[str], skill_workers: Dict[str, List[Worker]], role: str, level: int, assigned: List[str]) -> Tuple[str, bool]:
+def lookup_free_worker(skill_workers: Dict[str, List[Worker]], role: str, level: int, assigned: List[str]) -> Tuple[str, bool]:
     for worker in skill_workers[role]:
-        if worker.name in free_workers and worker.name not in assigned:
+        if worker.free and worker.name not in assigned:
             if worker.skills[role] >= level:
                 return worker.name, True
     return None, False
 
+def maximum_project_points(project: Project, current_day: int) -> int:
+    return max(0, (project.score+min(0, (project.bbefore-(current_day+project.duration)))))
+
 def main():
     workers, projects, skill_workers = input_data()
-    free_workers = [w.name for w in workers]
+    order_projects = [p for p in projects]
+    cant_free_workers = len(workers) # Amount of free (unoccupied) workers
     day = 0
     prev_num_projects = 0
     planned: List[PlannedProject] = []
@@ -86,34 +106,41 @@ def main():
     score = 0
     while projects:
         #print(day)
-        projects.sort(key=lambda x: max(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration))
-        #print([max(0, (x.score+min(0, (x.bbefore-(day+x.duration))))/x.duration) for x in projects])
-        #print(projects)
-        if prev_num_projects == len(projects) and len(free_workers) == len(workers):
+        order_projects.sort(key=lambda x: maximum_project_points(projects[x], day)/projects[x].duration)
+        if prev_num_projects == len(order_projects) and cant_free_workers == len(workers):
             break
-        prev_num_projects = len(projects)
-        starting_projects_names = []
-        ## VACIAMOS
+        prev_num_projects = len(order_projects)
+
+        #####
+        # Finish projects in progress (pending projects)
+        #####
+        # Check all in order to see if they are finished and we can recover the workers
         #print("a vaciar!")
-        removing_pends: List[str] = []
+        removing_pends: List[str] = [] # List of recently finished projects
         for pend in pending_projects:
             if day >= pend.start_day + pend.duration:
                 removing_pends.append(pend.name)
                 plann = [p for p in planned if p.name == pend.name][0]
                 for wk in plann.workers:
-                    free_workers.append(wk)
+                    cant_free_workers += 1
+                    workers[wk].free = True
                 extra_score = max(0, pend.score + min(0, (pend.bbefore-day)))
                 score += extra_score
         pending_projects = [p for p in pending_projects if p.name not in removing_pends]
-        #borrar projs de pends
-        for project in projects:
+        
+        #####
+        # Start the best projects that can be started
+        #####
+        starting_projects_names = []
+        for p_key in order_projects:
+            project = projects[p_key]
             #print("vaciado")
             project_cant = False
             assigned_workers = []
-            if len(project.roles) > len(free_workers):
+            if len(project.roles) > cant_free_workers:
                 continue
             for role in project.roles:
-                name, exists = lookup_free_worker(free_workers, skill_workers, role[0], role[1], assigned_workers)
+                name, exists = lookup_free_worker(skill_workers, role[0], role[1], assigned_workers)
                 if not exists:
                     project_cant = True
                     break
@@ -122,18 +149,20 @@ def main():
                     break
             if not project_cant:
                 for name in assigned_workers:
-                    free_workers.remove(name)
+                    cant_free_workers -= 1
+                    workers[name].free = False
                 starting_projects_names.append(project.name)
+                order_projects.remove(p_key)
                 planned.append(PlannedProject(project.name, assigned_workers))
-        pending_projects_new = [set_start_day(p, day) for p in projects if p.name in starting_projects_names]
+        pending_projects_new = [set_start_day(projects[p], day) for p in projects if projects[p].name in starting_projects_names]
         pending_projects += pending_projects_new
-        projects = [p for p in projects if p.name not in starting_projects_names]
+        # Go forward enough days so something changes
         if pending_projects:
             min_days_proj = min([(p.start_day+p.duration)-day for p in pending_projects])
             day += min_days_proj
         else:
             day += 1
-    print(score)
+    #print(score)
     print(len(planned))
     for plann in planned:
         print(plann.name)
