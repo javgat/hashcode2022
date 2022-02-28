@@ -10,11 +10,11 @@ so they are faster and they serve as a guide for future editions.
 - A: 33 (At.4)
 - B: 800991 (At.17)
 - C: 252765 (At.15)
-- D: 133020 (At.14)
+- D: 155218 (At.18)
 - E: 1601127 (At.7)
 - F: 625786 (At.15)
 
-Total score: 3413722
+Total score: 3435920
 
 ## Scores
 
@@ -152,11 +152,25 @@ Total score: 3413722
 - Points: 20, 743841, 252765, 133020, 1601127, 625786?
 
 ### Attempt 17
-- Total points: 3311852
+- Total points: 3327645
 - Sorting: sort_ratio_leftpoints_duration_bigger_first
 - Level up: True
 - Zero Projects: True
 - Simulate skip bug: False
 - Role lookup: individual_role_lookup --- role_lookup_free_worker
     - Check for simple collaboration: True
-- Points: 20, 800991, 243609, 118067, 1599450, 549715
+    - Min-level-collab: 0
+    - Max-level-collab: 0
+- Points: 20, 800991, 237523, 118067, 1599568, 571476
+
+### Attempt 18
+- Total points: 3349065
+- Sorting: sort_ratio_leftpoints_duration_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker
+    - Check for simple collaboration: True
+    - Min-level-collab: 0
+    - Max-level-collab: inf
+- Points: 20, 800991, 243255, 155218, 1599568, 550013

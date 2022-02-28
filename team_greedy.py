@@ -98,8 +98,8 @@ def maximum_project_points(project: Project, current_day: int) -> int:
 ##############
 
 def role_lookup_free_worker(skill_workers: Dict[str, List[Worker]], role: str, level: int,
-        assigned: List[str], accepts_zero: bool, workers: Dict[str, Worker]) -> Tuple[str, bool]:
-    if accepts_zero:
+        assigned: List[str], workers: Dict[str, Worker]) -> Tuple[str, bool]:
+    if level == 0:
         for w_name in workers:
             worker = workers[w_name]
             if worker.free and worker.name not in assigned:
@@ -112,11 +112,11 @@ def role_lookup_free_worker(skill_workers: Dict[str, List[Worker]], role: str, l
     return None, False
 
 def role_lookup_free_worker_dumbest_skill(skill_workers: Dict[str, List[Worker]], role: str,
-        level: int, assigned: List[str], accepts_zero: bool, workers: Dict[str, Worker]) -> Tuple[str, bool]:
+        level: int, assigned: List[str], workers: Dict[str, Worker]) -> Tuple[str, bool]:
     min_level = math.inf
     worker_name = ""
     worker_found = False
-    if accepts_zero:
+    if level == 0:
         for w_name in workers:
             worker = workers[w_name]
             if worker.free and worker.name not in assigned:
@@ -141,11 +141,11 @@ def role_lookup_free_worker_dumbest_skill(skill_workers: Dict[str, List[Worker]]
     return worker_name, True
 
 def role_lookup_free_worker_dumbest_general(skill_workers: Dict[str, List[Worker]], role: str,
-        level: int, assigned: List[str], accepts_zero: bool, workers: Dict[str, Worker]) -> Tuple[str, bool]:
+        level: int, assigned: List[str], workers: Dict[str, Worker]) -> Tuple[str, bool]:
     min_level = math.inf
     worker_name = ""
     worker_found = False
-    if accepts_zero:
+    if level == 0:
         for w_name in workers:
             worker = workers[w_name]
             if worker.free and worker.name not in assigned:
@@ -169,19 +169,29 @@ def role_lookup_free_worker_dumbest_general(skill_workers: Dict[str, List[Worker
         return None, False
     return worker_name, True
 
-SIMPLE_COLLAB: bool = True
+SIMPLE_COLLAB: bool = True # When looking up a free worker, allow a lower level worker if possible for the already assigned workers for the project
+MIN_LEVEL_COLLAB: int = 0 # Inferior level limit of collaboration. If equal to 0 it might affect performance.
+MAX_LEVEL_COLLAB: int = math.inf # Superior level limit of collaboration.
 
 def individual_role_lookup(project: Project, skill_workers: Dict[str, List[Worker]], workers: List[Worker]) -> Tuple[List[Worker], List[Tuple[str, int]], bool]:
     assigned_workers = []
     assigned_roles: List[Tuple[str, int]] = []
     project_possible = True
     for role in project.roles:
-        accepts_zero = False
-        if SIMPLE_COLLAB:
-            for arole in assigned_roles:
-                if role[1]==1 and arole[0] == role[0] and arole[1] >= 1:
-                    accepts_zero = True
-        name, exists = role_lookup_free_worker(skill_workers, role[0], role[1], assigned_workers, accepts_zero, workers)
+        level = role[1]
+        is_mentor = False
+        between_collab_limits = MIN_LEVEL_COLLAB <= (level-1) <= MAX_LEVEL_COLLAB
+        if SIMPLE_COLLAB and between_collab_limits:
+            for aname in assigned_workers:
+                worker = workers[aname]
+                if role[0] in worker.skills:
+                    if worker.skills[role[0]] >= role[1]:
+                        level -= 1
+                        is_mentor = True
+                        break
+                if is_mentor:
+                    break
+        name, exists = role_lookup_free_worker(skill_workers, role[0], level, assigned_workers, workers)
         if not exists:
             project_possible = False
             break
