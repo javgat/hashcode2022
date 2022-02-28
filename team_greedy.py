@@ -1,6 +1,7 @@
 # Greedy implementation
 
 from dataclasses import dataclass
+from enum import Enum
 from typing import Dict, List, Tuple
 
 @dataclass
@@ -95,6 +96,18 @@ def lookup_free_worker(skill_workers: Dict[str, List[Worker]], role: str, level:
 def maximum_project_points(project: Project, current_day: int) -> int:
     return max(0, (project.score+min(0, (project.bbefore-(current_day+project.duration)))))
 
+def sort_ratio_leftpoints_duration_less_first(name: str, projects: Dict[str, Project], day: int) -> float:
+    return maximum_project_points(projects[name], day)/projects[name].duration
+
+def sort_ratio_leftpoints_duration_bigger_first(name: str, projects: Dict[str, Project], day: int) -> float:
+    return -(maximum_project_points(projects[name], day)/projects[name].duration)
+
+def sort_ratio_leftpoints_duration_bigger_first_secondary_shortest(name: str, projects: Dict[str, Project], day: int) -> Tuple[float, int]:
+    return (-maximum_project_points(projects[name], day)/projects[name].duration, projects[name].duration)
+
+LEVEL_UP: bool = True # Workers level up
+ZERO_PROJECTS: bool = True # Dinamically ignore the projects that won't give points.
+
 def main():
     workers, projects, skill_workers = input_data()
     order_projects = [p for p in projects]
@@ -106,7 +119,7 @@ def main():
     score = 0
     while projects:
         #print(day)
-        order_projects.sort(key=lambda x: maximum_project_points(projects[x], day)/projects[x].duration)
+        order_projects.sort(key=lambda x: sort_ratio_leftpoints_duration_bigger_first_secondary_shortest(x, projects, day))
         if prev_num_projects == len(order_projects) and cant_free_workers == len(workers):
             break
         prev_num_projects = len(order_projects)
@@ -115,7 +128,7 @@ def main():
         # Finish projects in progress (pending projects)
         #####
         # Check all in order to see if they are finished and we can recover the workers
-        #print("a vaciar!")
+        #print("Finishing projects...")
         removing_pends: List[str] = [] # List of recently finished projects
         for pend in pending_projects:
             if day >= pend.start_day + pend.duration:
@@ -127,16 +140,25 @@ def main():
                 extra_score = max(0, pend.score + min(0, (pend.bbefore-day)))
                 score += extra_score
         pending_projects = [p for p in pending_projects if p.name not in removing_pends]
+        #print("Projects finished.")
         
         #####
         # Start the best projects that can be started
         #####
         starting_projects_names = []
+        zero_projects: List[str] = [] # names of projects to be ignored
         for p_key in order_projects:
+            #print("Checking project:", p_key)
             project = projects[p_key]
-            #print("vaciado")
+            if ZERO_PROJECTS:
+                # Check if the project wont give any points and we cant ignore it
+                p_score = maximum_project_points(project, day)
+                if p_score == 0:
+                    zero_projects.append(p_key)
+                    continue
             project_cant = False
             assigned_workers = []
+            assigned_roles: List[Tuple[str, int]] = []
             if len(project.roles) > cant_free_workers:
                 continue
             for role in project.roles:
@@ -145,23 +167,32 @@ def main():
                     project_cant = True
                     break
                 assigned_workers.append(name)
+                assigned_roles.append(role)
                 if project_cant:
                     break
             if not project_cant:
-                for name in assigned_workers:
+                for ass_w_index, name in enumerate(assigned_workers):
                     cant_free_workers -= 1
                     workers[name].free = False
+                    if LEVEL_UP:
+                        role = assigned_roles[ass_w_index]
+                        if workers[name].skills[role[0]] <= role[1]:
+                            workers[name].skills[role[0]] += 1
                 starting_projects_names.append(project.name)
                 order_projects.remove(p_key)
                 planned.append(PlannedProject(project.name, assigned_workers))
         pending_projects_new = [set_start_day(projects[p], day) for p in projects if projects[p].name in starting_projects_names]
         pending_projects += pending_projects_new
+        for p in zero_projects:
+            order_projects.remove(p)
+
         # Go forward enough days so something changes
         if pending_projects:
             min_days_proj = min([(p.start_day+p.duration)-day for p in pending_projects])
             day += min_days_proj
         else:
             day += 1
+
     #print(score)
     print(len(planned))
     for plann in planned:

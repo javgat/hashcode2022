@@ -7,8 +7,23 @@ so they are faster and they serve as a guide for future editions.
 
 ## Scores
 
-team_greedy: 2296375
+### Attempt 1
+- Total points: 2296375
+- Sorting: sort_ratio_leftpoints_duration_less_first
+- Level up: False
+- Zero Projects: False
+- Points: 30, 310676, 47076, 54835, 1591904, 291854
 
-30, 310676, 47076, 54835, 1591904, 291854
+### Attempt 2
+- Total points: 3060553
+- Sorting: sort_ratio_leftpoints_duration_bigger_first_secondary_shortest
+- Level up: True
+- Zero Projects: False
+- Points: 20, 743826, 149638, 91424, 1594675, 480970
 
-team_greedy_2:
+### Attempt 3
+- Total points: 3273217
+- Sorting: sort_ratio_leftpoints_duration_bigger_first_secondary_shortest
+- Level up: True
+- Zero Projects: True
+- Points: 20, 743826, 243609, 91424, 1595711, 598627
