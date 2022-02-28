@@ -107,6 +107,8 @@ def sort_ratio_leftpoints_duration_bigger_first_secondary_shortest(name: str, pr
 
 LEVEL_UP: bool = True # Workers level up
 ZERO_PROJECTS: bool = True # Dinamically ignore the projects that won't give points.
+SIMULATE_SKIP_BUG: bool = True # Accidental feature where if a project was accepted.
+# the next project in the list was skipped. It was a bug but sometimes gave better results.
 
 def main():
     workers, projects, skill_workers = input_data()
@@ -119,7 +121,7 @@ def main():
     score = 0
     while projects:
         #print(day)
-        order_projects.sort(key=lambda x: sort_ratio_leftpoints_duration_less_first(x, projects, day))
+        order_projects.sort(key=lambda x: sort_ratio_leftpoints_duration_bigger_first(x, projects, day))
         if prev_num_projects == len(order_projects) and cant_free_workers == len(workers):
             break
         prev_num_projects = len(order_projects)
@@ -147,7 +149,11 @@ def main():
         #####
         starting_projects_names = []
         zero_projects: List[str] = [] # names of projects to be ignored
+        prev_project_success = False
         for p_key in order_projects:
+            if SIMULATE_SKIP_BUG and prev_project_success:
+                prev_project_success = False
+                continue
             #print("Checking project:", p_key)
             project = projects[p_key]
             if ZERO_PROJECTS:
@@ -180,6 +186,7 @@ def main():
                             workers[name].skills[role[0]] += 1
                 starting_projects_names.append(p_key)
                 planned.append(PlannedProject(project.name, assigned_workers))
+                prev_project_success = True
         for p_key in starting_projects_names:
             order_projects.remove(p_key)
             pending_projects.append(set_start_day(projects[p_key], day))
