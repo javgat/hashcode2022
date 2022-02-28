@@ -9,12 +9,12 @@ so they are faster and they serve as a guide for future editions.
 
 - A: 33 (At.4)
 - B: 800991 (At.17)
-- C: 252765 (At.15)
-- D: 155218 (At.18)
-- E: 1601127 (At.7)
+- C: 260749 (At.22)
+- D: 161720 (At.22)
+- E: 1601500 (At.22)
 - F: 625786 (At.15)
 
-Total score: 3435920
+Total score: 3450779
 
 ## Scores
 
@@ -174,3 +174,51 @@ Total score: 3435920
     - Min-level-collab: 0
     - Max-level-collab: inf
 - Points: 20, 800991, 243255, 155218, 1599568, 550013
+
+### Attempt 19
+- Total points: 3371740
+- Sorting: sort_ratio_leftpoints_duration_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker
+    - Check for simple collaboration: True
+    - Min-level-collab: 0
+    - Max-level-collab: 2
+- Points: 20, 800991, 235641, 152968, 1599568, 582552
+
+### Attempt 20
+- Total points: 3288853
+- Sorting: sort_ratio_leftpoints_duration_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker_dumbest_skill
+    - Check for simple collaboration: True
+    - Min-level-collab: 1
+    - Max-level-collab: inf
+- Points: 20, 743841, 250735, 133020, 1601127, 560110
+
+### Attempt 21
+- Total points: 3347824
+- Sorting: sort_ratio_leftpoints_duration_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker_dumbest_general
+    - Check for simple collaboration: True
+    - Min-level-collab: 1
+    - Max-level-collab: inf
+- Points: 20, 743841, 249702, 133020, 1601127, 620114
+
+### Attempt 22
+- Total points: 3421053
+- Sorting: sort_ratio_leftpoints_duration_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker_dumbest_general
+    - Check for simple collaboration: True
+    - Min-level-collab: 0
+    - Max-level-collab: inf
+- Points: 20, 800958, 260749, 161720, 1601500, 596106

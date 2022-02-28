@@ -191,7 +191,7 @@ def individual_role_lookup(project: Project, skill_workers: Dict[str, List[Worke
                         break
                 if is_mentor:
                     break
-        name, exists = role_lookup_free_worker(skill_workers, role[0], level, assigned_workers, workers)
+        name, exists = role_lookup_free_worker_dumbest_general(skill_workers, role[0], level, assigned_workers, workers)
         if not exists:
             project_possible = False
             break
