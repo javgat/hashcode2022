@@ -5,6 +5,17 @@ Proposed answers.
 This answers were the ones used by the team "send_pepes", but they have been optimized
 so they are faster and they serve as a guide for future editions.
 
+## Best scores
+
+- A: 33 (At.4)
+- B: 800991 (At.17)
+- C: 252765 (At.15)
+- D: 133020 (At.14)
+- E: 1601127 (At.7)
+- F: 625786 (At.15)
+
+Total score: 3413722
+
 ## Scores
 
 ### Attempt 1
@@ -89,7 +100,7 @@ so they are faster and they serve as a guide for future editions.
 
 ### Attempt 11
 - Total points: 3238094
-- Sorting: sort_ratio_leftpoints_duration_bigger_first
+- Sorting: sort_leftpoints_bigger
 - Level up: True
 - Zero Projects: True
 - Simulate skip bug: False
@@ -110,3 +121,42 @@ so they are faster and they serve as a guide for future editions.
 - Zero Projects: True
 - Simulate skip bug: False
 - Points: 33, 743796, 183693, 91424, 1597202, 583427
+
+### Attempt 14
+- Total points: 3326209
+- Sorting: sort_ratio_leftpoints_duration_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker_dumbest_skill
+- Points: 20, 743841, 247423, 133020, 1601127, 600778
+
+### Attempt 15
+- Total points: 3356559
+- Sorting: sort_ratio_leftpoints_duration_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker_dumbest_general
+- Points: 20, 743841, 252765, 133020, 1601127, 625786
+
+### Attempt 16
+- Total points: 3356559 Probably. Not finished because it was slow.
+- Sorting: sort_ratio_leftpoints_duration_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker_dumbest_general
+    - Check for simple collaboration: True
+    - NOTE: Code was wrong. Should execute again to check if score is correct.
+- Points: 20, 743841, 252765, 133020, 1601127, 625786?
+
+### Attempt 17
+- Total points: 3311852
+- Sorting: sort_ratio_leftpoints_duration_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker
+    - Check for simple collaboration: True
+- Points: 20, 800991, 243609, 118067, 1599450, 549715

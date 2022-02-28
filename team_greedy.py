@@ -2,12 +2,14 @@
 
 from dataclasses import dataclass
 from enum import Enum
+import math
 from typing import Dict, List, Tuple
 
 @dataclass
 class Worker():
     name: str
     skills: Dict[str, int]
+    skill_level: int
     free: bool = True
 
 @dataclass
@@ -50,12 +52,14 @@ def input_data() -> Tuple[Dict[str, Worker], Dict[str, Project], Dict[str, List[
         name = worker_line[0]
         n_skills = int(worker_line[1])
         skills = {}
+        skill_level = 0
         for _ in range(n_skills):
             skill_line = input().split()
             s_name = skill_line[0]
             s_level = int(skill_line[1])
             skills[s_name] = s_level
-        w = Worker(name, skills)
+            skill_level += s_level
+        w = Worker(name, skills, skill_level)
         for skill in w.skills:
             if skill in skill_workers:
                 skill_workers[skill].append(w)
@@ -93,12 +97,97 @@ def maximum_project_points(project: Project, current_day: int) -> int:
 #### Worker lookup methods
 ##############
 
-def lookup_free_worker(skill_workers: Dict[str, List[Worker]], role: str, level: int, assigned: List[str]) -> Tuple[str, bool]:
-    for worker in skill_workers[role]:
-        if worker.free and worker.name not in assigned:
-            if worker.skills[role] >= level:
+def role_lookup_free_worker(skill_workers: Dict[str, List[Worker]], role: str, level: int,
+        assigned: List[str], accepts_zero: bool, workers: Dict[str, Worker]) -> Tuple[str, bool]:
+    if accepts_zero:
+        for w_name in workers:
+            worker = workers[w_name]
+            if worker.free and worker.name not in assigned:
                 return worker.name, True
+    else:
+        for worker in skill_workers[role]:
+            if worker.free and worker.name not in assigned:
+                if worker.skills[role] >= level:
+                    return worker.name, True
     return None, False
+
+def role_lookup_free_worker_dumbest_skill(skill_workers: Dict[str, List[Worker]], role: str,
+        level: int, assigned: List[str], accepts_zero: bool, workers: Dict[str, Worker]) -> Tuple[str, bool]:
+    min_level = math.inf
+    worker_name = ""
+    worker_found = False
+    if accepts_zero:
+        for w_name in workers:
+            worker = workers[w_name]
+            if worker.free and worker.name not in assigned:
+                w_level = 0
+                if role in worker.skills:
+                    w_level = worker.skills[role]
+                if min_level > w_level >= level:
+                    min_level = w_level
+                    worker_name = worker.name
+                    worker_found = True
+            if worker_found and min_level == 0:
+                break
+    else:
+        for worker in skill_workers[role]:
+            if worker.free and worker.name not in assigned:
+                if min_level > worker.skills[role] >= level:
+                    min_level = worker.skills[role]
+                    worker_name = worker.name
+                    worker_found = True
+    if not worker_found:
+        return None, False
+    return worker_name, True
+
+def role_lookup_free_worker_dumbest_general(skill_workers: Dict[str, List[Worker]], role: str,
+        level: int, assigned: List[str], accepts_zero: bool, workers: Dict[str, Worker]) -> Tuple[str, bool]:
+    min_level = math.inf
+    worker_name = ""
+    worker_found = False
+    if accepts_zero:
+        for w_name in workers:
+            worker = workers[w_name]
+            if worker.free and worker.name not in assigned:
+                w_level = 0
+                if role in worker.skills:
+                    w_level = worker.skills[role]
+                if w_level >= level and min_level > worker.skill_level:
+                    min_level = worker.skill_level
+                    worker_name = worker.name
+                    worker_found = True
+            if worker_found and min_level == 0:
+                break
+    else:
+        for worker in skill_workers[role]:
+            if worker.free and worker.name not in assigned:
+                if worker.skills[role] >= level and min_level > worker.skill_level:
+                    min_level = worker.skill_level
+                    worker_name = worker.name
+                    worker_found = True
+    if not worker_found:
+        return None, False
+    return worker_name, True
+
+SIMPLE_COLLAB: bool = True
+
+def individual_role_lookup(project: Project, skill_workers: Dict[str, List[Worker]], workers: List[Worker]) -> Tuple[List[Worker], List[Tuple[str, int]], bool]:
+    assigned_workers = []
+    assigned_roles: List[Tuple[str, int]] = []
+    project_possible = True
+    for role in project.roles:
+        accepts_zero = False
+        if SIMPLE_COLLAB:
+            for arole in assigned_roles:
+                if role[1]==1 and arole[0] == role[0] and arole[1] >= 1:
+                    accepts_zero = True
+        name, exists = role_lookup_free_worker(skill_workers, role[0], role[1], assigned_workers, accepts_zero, workers)
+        if not exists:
+            project_possible = False
+            break
+        assigned_workers.append(name)
+        assigned_roles.append(role)
+    return (assigned_workers, assigned_roles, project_possible)
 
 ############
 #### Sorting methods
@@ -138,7 +227,7 @@ def main():
     score = 0
     while projects:
         #print(day)
-        order_projects.sort(key=lambda x: sort_shortest_first(x, projects, day))
+        order_projects.sort(key=lambda x: sort_ratio_leftpoints_duration_bigger_first(x, projects, day))
         if prev_num_projects == len(order_projects) and cant_free_workers == len(workers):
             break
         prev_num_projects = len(order_projects)
@@ -179,28 +268,24 @@ def main():
                 if p_score == 0:
                     zero_projects.append(p_key)
                     continue
-            project_cant = False
-            assigned_workers = []
-            assigned_roles: List[Tuple[str, int]] = []
             if len(project.roles) > cant_free_workers:
                 continue
-            for role in project.roles:
-                name, exists = lookup_free_worker(skill_workers, role[0], role[1], assigned_workers)
-                if not exists:
-                    project_cant = True
-                    break
-                assigned_workers.append(name)
-                assigned_roles.append(role)
-                if project_cant:
-                    break
-            if not project_cant:
+            assigned_workers, assigned_roles, project_possible = individual_role_lookup(project, skill_workers, workers)
+            if project_possible:
                 for ass_w_index, name in enumerate(assigned_workers):
                     cant_free_workers -= 1
                     workers[name].free = False
                     if LEVEL_UP:
                         role = assigned_roles[ass_w_index]
-                        if workers[name].skills[role[0]] <= role[1]:
-                            workers[name].skills[role[0]] += 1
+                        worker_level = 0
+                        if role[0] in workers[name].skills:
+                            worker_level = workers[name].skills[role[0]]
+                        if worker_level <= role[1]:
+                            if worker_level == 0:
+                                workers[name].skills[role[0]] = 1
+                            else:
+                                workers[name].skills[role[0]] += 1
+                                workers[name].skill_level += 1
                 starting_projects_names.append(p_key)
                 planned.append(PlannedProject(project.name, assigned_workers))
                 prev_project_success = True
