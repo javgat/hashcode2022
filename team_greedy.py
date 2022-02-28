@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from enum import Enum
 import math
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 @dataclass
 class Worker():
@@ -193,7 +193,7 @@ def individual_role_lookup(project: Project, skill_workers: Dict[str, List[Worke
                         break
                 if is_mentor:
                     break
-        name, exists = role_lookup_free_worker_dumbest_general(skill_workers, role[0], level, assigned_workers, workers)
+        name, exists = role_lookup_free_worker(skill_workers, role[0], level, assigned_workers, workers)
         if not exists:
             project_possible = False
             break
@@ -205,23 +205,46 @@ def individual_role_lookup(project: Project, skill_workers: Dict[str, List[Worke
 #### Sorting methods
 ############
 
-def sort_ratio_leftpoints_duration_less_first(name: str, projects: Dict[str, Project], day: int) -> float:
+def sort_ratio_leftpoints_duration_less_first(name: str, projects: Dict[str, Project], day: int, _: Any) -> float:
     return maximum_project_points(projects[name], day)/projects[name].duration
 
-def sort_ratio_leftpoints_duration_bigger_first(name: str, projects: Dict[str, Project], day: int) -> float:
+def sort_ratio_leftpoints_duration_bigger_first(name: str, projects: Dict[str, Project], day: int, _: Any) -> float:
     return -(maximum_project_points(projects[name], day)/projects[name].duration)
 
-def sort_ratio_leftpoints_duration_bigger_first_secondary_shortest(name: str, projects: Dict[str, Project], day: int) -> Tuple[float, int]:
+def sort_ratio_leftpoints_duration_bigger_first_secondary_shortest(name: str, projects: Dict[str, Project], day: int, _: Any) -> Tuple[float, int]:
     return (-maximum_project_points(projects[name], day)/projects[name].duration, projects[name].duration)
 
-def sort_leftpoints_bigger(name: str, projects: Dict[str, Project], day: int) -> float:
+def sort_leftpoints_bigger(name: str, projects: Dict[str, Project], day: int, _: Any) -> float:
     return -maximum_project_points(projects[name], day)
 
-def sort_substraction_leftpoints_bigger(name: str, projects: Dict[str, Project], day: int) -> float:
+def sort_substraction_leftpoints_bigger(name: str, projects: Dict[str, Project], day: int, _: Any) -> float:
     return -(maximum_project_points(projects[name], day)-projects[name].duration)
 
-def sort_shortest_first(name: str, projects: Dict[str, Project], day: int) -> float:
+def sort_shortest_first(name: str, projects: Dict[str, Project], day: Any, _: Any) -> float:
     return projects[name].duration
+
+def sort_ratio_skills_workers_ratio_leftpoints_duration_bigger_first(name: str, projects: Dict[str, Project], day: int, skill_workers: Dict[str, List[Worker]]) -> float:
+    skilled_workers = 0
+    project = projects[name]
+    for role in project.roles:
+        if role in skill_workers:
+            skilled_workers += skill_workers[role]
+    cant_roles = len(projects[name].roles)
+    if cant_roles == 0:
+        cant_roles = 1
+    ratio_skilled_workers = skilled_workers/cant_roles
+    return  -(ratio_skilled_workers*maximum_project_points(projects[name], day)/projects[name].duration)
+
+def sort_ratio_skills_workers_bigger_first(name: str, projects: Dict[str, Project], day: int, skill_workers: Dict[str, List[Worker]]) -> float:
+    skilled_workers = 0
+    project = projects[name]
+    for role in project.roles:
+        if role in skill_workers:
+            skilled_workers += skill_workers[role]
+    cant_roles = len(projects[name].roles)
+    if cant_roles == 0:
+        cant_roles = 1
+    return  -(skilled_workers/cant_roles)
 
 LEVEL_UP: bool = True # Workers level up
 ZERO_PROJECTS: bool = True # Dinamically ignore the projects that won't give points.
@@ -242,7 +265,7 @@ def main():
             skill_workers[skill].reverse()
     while projects:
         #print(day)
-        order_projects.sort(key=lambda x: sort_leftpoints_bigger(x, projects, day))
+        order_projects.sort(key=lambda x: sort_ratio_skills_workers_ratio_leftpoints_duration_bigger_first(x, projects, day, skill_workers))
         if prev_num_projects == len(order_projects) and cant_free_workers == len(workers):
             break
         prev_num_projects = len(order_projects)

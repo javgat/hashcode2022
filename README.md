@@ -11,7 +11,7 @@ so they are faster and they serve as a guide for future editions.
 - B: 800991 (At.17)
 - C: 266929 (At.26)
 - D: 161720 (At.22)
-- E: 1601500 (At.22)
+- E: 1601791 (At.27)
 - F: 625786 (At.15)
 
 Total score: 3456959
@@ -273,3 +273,16 @@ Total score: 3456959
     - Max-level-collab: inf
     - Reverse skill_workers: False
 - Points: 20, 800991, 266929, 161720, 1597753, 580323
+
+### Attempt 27
+- Total points: 3346250
+- Sorting: sort_ratio_skills_workers_ratio_leftpoints_duration_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker
+    - Check for simple collaboration: True
+    - Min-level-collab: 0
+    - Max-level-collab: inf
+    - Reverse skill_workers: False
+- Points: 33, 800991, 177704, 155218, 1601791, 503871
