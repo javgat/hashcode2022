@@ -119,7 +119,7 @@ def main():
     score = 0
     while projects:
         #print(day)
-        order_projects.sort(key=lambda x: sort_ratio_leftpoints_duration_bigger_first_secondary_shortest(x, projects, day))
+        order_projects.sort(key=lambda x: sort_ratio_leftpoints_duration_less_first(x, projects, day))
         if prev_num_projects == len(order_projects) and cant_free_workers == len(workers):
             break
         prev_num_projects = len(order_projects)
@@ -178,11 +178,11 @@ def main():
                         role = assigned_roles[ass_w_index]
                         if workers[name].skills[role[0]] <= role[1]:
                             workers[name].skills[role[0]] += 1
-                starting_projects_names.append(project.name)
-                order_projects.remove(p_key)
+                starting_projects_names.append(p_key)
                 planned.append(PlannedProject(project.name, assigned_workers))
-        pending_projects_new = [set_start_day(projects[p], day) for p in projects if projects[p].name in starting_projects_names]
-        pending_projects += pending_projects_new
+        for p_key in starting_projects_names:
+            order_projects.remove(p_key)
+            pending_projects.append(set_start_day(projects[p_key], day))
         for p in zero_projects:
             order_projects.remove(p)
 
@@ -193,7 +193,7 @@ def main():
         else:
             day += 1
 
-    #print(score)
+    print(score)
     print(len(planned))
     for plann in planned:
         print(plann.name)

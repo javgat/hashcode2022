@@ -27,3 +27,10 @@ so they are faster and they serve as a guide for future editions.
 - Level up: True
 - Zero Projects: True
 - Points: 20, 743826, 243609, 91424, 1595711, 598627
+
+### Attempt 4
+- Total points: 3034298
+- Sorting: sort_ratio_leftpoints_duration_less_first
+- Level up: True
+- Zero Projects: True
+- Points: 33, 743841, 122607, 91424, 1596465, 479928
