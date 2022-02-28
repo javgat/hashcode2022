@@ -222,3 +222,15 @@ Total score: 3450779
     - Min-level-collab: 0
     - Max-level-collab: inf
 - Points: 20, 800958, 260749, 161720, 1601500, 596106
+
+### Attempt 23
+- Total points: 3388587
+- Sorting: sort_ratio_leftpoints_duration_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker_dumbest_skill
+    - Check for simple collaboration: True
+    - Min-level-collab: 0
+    - Max-level-collab: inf
+- Points: 20, 800958, 248322, 161720, 1600887, 576680
