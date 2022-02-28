@@ -86,6 +86,13 @@ def set_start_day(p: Project, day: int) -> Project:
     p.start_day = day
     return p
 
+def maximum_project_points(project: Project, current_day: int) -> int:
+    return max(0, (project.score+min(0, (project.bbefore-(current_day+project.duration)))))
+
+##############
+#### Worker lookup methods
+##############
+
 def lookup_free_worker(skill_workers: Dict[str, List[Worker]], role: str, level: int, assigned: List[str]) -> Tuple[str, bool]:
     for worker in skill_workers[role]:
         if worker.free and worker.name not in assigned:
@@ -93,8 +100,9 @@ def lookup_free_worker(skill_workers: Dict[str, List[Worker]], role: str, level:
                 return worker.name, True
     return None, False
 
-def maximum_project_points(project: Project, current_day: int) -> int:
-    return max(0, (project.score+min(0, (project.bbefore-(current_day+project.duration)))))
+############
+#### Sorting methods
+############
 
 def sort_ratio_leftpoints_duration_less_first(name: str, projects: Dict[str, Project], day: int) -> float:
     return maximum_project_points(projects[name], day)/projects[name].duration
@@ -105,9 +113,18 @@ def sort_ratio_leftpoints_duration_bigger_first(name: str, projects: Dict[str, P
 def sort_ratio_leftpoints_duration_bigger_first_secondary_shortest(name: str, projects: Dict[str, Project], day: int) -> Tuple[float, int]:
     return (-maximum_project_points(projects[name], day)/projects[name].duration, projects[name].duration)
 
+def sort_leftpoints_bigger(name: str, projects: Dict[str, Project], day: int) -> float:
+    return -maximum_project_points(projects[name], day)
+
+def sort_substraction_leftpoints_bigger(name: str, projects: Dict[str, Project], day: int) -> float:
+    return -(maximum_project_points(projects[name], day)-projects[name].duration)
+
+def sort_shortest_first(name: str, projects: Dict[str, Project], day: int) -> float:
+    return projects[name].duration
+
 LEVEL_UP: bool = True # Workers level up
 ZERO_PROJECTS: bool = True # Dinamically ignore the projects that won't give points.
-SIMULATE_SKIP_BUG: bool = True # Accidental feature where if a project was accepted.
+SIMULATE_SKIP_BUG: bool = False # Accidental feature where if a project was accepted.
 # the next project in the list was skipped. It was a bug but sometimes gave better results.
 
 def main():
@@ -121,7 +138,7 @@ def main():
     score = 0
     while projects:
         #print(day)
-        order_projects.sort(key=lambda x: sort_ratio_leftpoints_duration_bigger_first(x, projects, day))
+        order_projects.sort(key=lambda x: sort_shortest_first(x, projects, day))
         if prev_num_projects == len(order_projects) and cant_free_workers == len(workers):
             break
         prev_num_projects = len(order_projects)

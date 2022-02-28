@@ -86,3 +86,27 @@ so they are faster and they serve as a guide for future editions.
 - Zero Projects: True
 - Simulate skip bug: True
 - Points: 20, 743826, 243609, 91424, 1595944, 598627
+
+### Attempt 11
+- Total points: 3238094
+- Sorting: sort_ratio_leftpoints_duration_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Points: 20, 743841, 234169, 91424, 1601022, 567618
+
+### Attempt 12
+- Total points: 3248865
+- Sorting: sort_substraction_leftpoints_bigger
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Points: 20, 743841, 217204, 91424, 1595949, 600427
+
+### Attempt 13
+- Total points: 3199575
+- Sorting: sort_shortest_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Points: 33, 743796, 183693, 91424, 1597202, 583427
