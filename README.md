@@ -9,12 +9,12 @@ so they are faster and they serve as a guide for future editions.
 
 - A: 33 (At.4)
 - B: 800991 (At.17)
-- C: 260749 (At.22)
+- C: 266929 (At.26)
 - D: 161720 (At.22)
 - E: 1601500 (At.22)
 - F: 625786 (At.15)
 
-Total score: 3450779
+Total score: 3456959
 
 ## Scores
 
@@ -234,3 +234,42 @@ Total score: 3450779
     - Min-level-collab: 0
     - Max-level-collab: inf
 - Points: 20, 800958, 248322, 161720, 1600887, 576680
+
+### Attempt 24
+- Total points: 3374041
+- Sorting: sort_ratio_leftpoints_duration_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker
+    - Check for simple collaboration: True
+    - Min-level-collab: 0
+    - Max-level-collab: inf
+    - Reverse skill_workers: True
+- Points: 20, 800943, 247604, 155218, 1599568, 570688
+
+### Attempt 25
+- Total points: 3346250
+- Sorting: sort_leftpoints_bigger
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker
+    - Check for simple collaboration: True
+    - Min-level-collab: 0
+    - Max-level-collab: inf
+    - Reverse skill_workers: False
+- Points: 20, 800990, 233889, 155218, 1597796, 558337
+
+### Attempt 26
+- Total points: 3407736
+- Sorting: sort_leftpoints_bigger
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker_dumbest_general
+    - Check for simple collaboration: True
+    - Min-level-collab: 0
+    - Max-level-collab: inf
+    - Reverse skill_workers: False
+- Points: 20, 800991, 266929, 161720, 1597753, 580323

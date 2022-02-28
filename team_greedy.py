@@ -172,6 +172,8 @@ def role_lookup_free_worker_dumbest_general(skill_workers: Dict[str, List[Worker
 SIMPLE_COLLAB: bool = True # When looking up a free worker, allow a lower level worker if possible for the already assigned workers for the project
 MIN_LEVEL_COLLAB: int = 0 # Inferior level limit of collaboration. If equal to 0 it might affect performance.
 MAX_LEVEL_COLLAB: int = math.inf # Superior level limit of collaboration.
+REVERSE_SKILL_WORKERS: bool = False # Reverses all lists of skill_workers dictionary.
+# Gives different outcome for some lookups, speciallt role_lookup_free_worker
 
 def individual_role_lookup(project: Project, skill_workers: Dict[str, List[Worker]], workers: List[Worker]) -> Tuple[List[Worker], List[Tuple[str, int]], bool]:
     assigned_workers = []
@@ -191,7 +193,7 @@ def individual_role_lookup(project: Project, skill_workers: Dict[str, List[Worke
                         break
                 if is_mentor:
                     break
-        name, exists = role_lookup_free_worker_dumbest_skill(skill_workers, role[0], level, assigned_workers, workers)
+        name, exists = role_lookup_free_worker_dumbest_general(skill_workers, role[0], level, assigned_workers, workers)
         if not exists:
             project_possible = False
             break
@@ -235,9 +237,12 @@ def main():
     planned: List[PlannedProject] = []
     pending_projects: List[Project] = []
     score = 0
+    if REVERSE_SKILL_WORKERS:
+        for skill in skill_workers:
+            skill_workers[skill].reverse()
     while projects:
         #print(day)
-        order_projects.sort(key=lambda x: sort_ratio_leftpoints_duration_bigger_first(x, projects, day))
+        order_projects.sort(key=lambda x: sort_leftpoints_bigger(x, projects, day))
         if prev_num_projects == len(order_projects) and cant_free_workers == len(workers):
             break
         prev_num_projects = len(order_projects)
