@@ -5,6 +5,9 @@ Proposed answers.
 This answers were the ones used by the team "send_pepes", but they have been optimized
 so they are faster and they serve as a guide for future editions.
 
+Some have been added, achieving a higher score. In-contest score was 2857175, but now the
+maximum score reached with these answers is 3457250.
+
 ## Best scores
 
 - A: 33 (At.4)
