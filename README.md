@@ -14,7 +14,7 @@ so they are faster and they serve as a guide for future editions.
 - E: 1601791 (At.27)
 - F: 625786 (At.15)
 
-Total score: 3456959
+Total score: 3457250
 
 ## Scores
 
@@ -286,3 +286,64 @@ Total score: 3456959
     - Max-level-collab: inf
     - Reverse skill_workers: False
 - Points: 33, 800991, 177704, 155218, 1601791, 503871
+
+### Attempt 28
+- Total points: 3346250
+- Sorting: sort_ratio_skills_workers_bigger_first
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker
+    - Check for simple collaboration: True
+    - Min-level-collab: 0
+    - Max-level-collab: inf
+    - Reverse skill_workers: False
+- Points: 33, 800991, 177704, 155218, 1601791, 503871
+
+### Attempt 29
+- Total points: 3219680
+- Sorting: sort_ratio_skills_workers_ratio_leftpoints_duration_bigger_first
+    - Normalize sorting params: True
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker
+    - Check for simple collaboration: True
+    - Min-level-collab: 0
+    - Max-level-collab: inf
+    - Reverse skill_workers: False
+- Points: 33, 800980, 158274, 155218, 1601791, 503384
+
+### Attempt 30
+- Total points: 3219680
+- Sorting: sort_ratio_skills_workers_ratio_leftpoints_duration_bigger_first
+    - Normalize sorting params: True
+    - Score factor: 3
+    - Duration factor: 1
+    - Ratio skills-workers: 1
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker
+    - Check for simple collaboration: True
+    - Min-level-collab: 0
+    - Max-level-collab: inf
+    - Reverse skill_workers: False
+- Points: 33, 800980, 158274, 155218, 1601791, 503384
+
+### Attempt 31
+- Total points: 3219680
+- Sorting: sort_ratio_leftpoints_duration_bigger_first_secondary_shortest
+    - Normalize sorting params: True
+    - Score factor: 1
+    - Duration factor: 1
+    - Ratio skills-workers: 1
+- Level up: True
+- Zero Projects: True
+- Simulate skip bug: False
+- Role lookup: individual_role_lookup --- role_lookup_free_worker_dumbest_general
+    - Check for simple collaboration: True
+    - Min-level-collab: 0
+    - Max-level-collab: inf
+    - Reverse skill_workers: False
+- Points: 33, 800943, 173613, 161720, 1597672, 534246
